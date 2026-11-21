@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1D4ED8">
+<title>Simulador · El Taller Moderno · E.E.T.P. N° 468</title>
+<style>
+  :root{
+    --bg:#F8FAFC;
+    --card:#FFFFFF;
+    --ink:#0F172A;
+    --muted:#475569;
+    --line:#CBD5E1;
+    --blue:#1D4ED8;
+    --blue-soft:#DBEAFE;
+    --green:#15803D;
+    --green-soft:#DCFCE7;
+    --amber:#B45309;
+    --amber-soft:#FEF3C7;
+    --red:#B91C1C;
+    --red-soft:#FEE2E2;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Roboto","Segoe UI",Arial,sans-serif;
+    font-size:13pt;
+    line-height:1.5;
+    overflow-x:hidden;
+    -webkit-text-size-adjust:100%;
+    overflow-wrap:break-word;
+    word-wrap:break-word;
+  }
+  [hidden]{ display:none !important; }
+  .wrap{ max-width:600px; margin:0 auto; padding:12px 12px 48px; }
+
+  /* ---------- ENCABEZADO ---------- */
+  .head{
+    background:linear-gradient(135deg,#0F2A5C 0%,#1D4ED8 100%);
+    color:#fff;
+    border-radius:16px;
+    padding:18px 16px;
+    margin-bottom:14px;
+    box-shadow:0 4px 14px rgba(29,78,216,.25);
+  }
+  .head-top{
+    font-size:11.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    opacity:.9;
+    font-weight:700;
+  }
+  .head h1{ margin:6px 0 4px; font-size:21px; line-height:1.2; }
+  .head-sub{ margin:0; font-size:13px; opacity:.95; }
+  .head-meta{ margin:10px 0 0; font-size:11.5px; opacity:.85; line-height:1.4; }
+
+  /* ---------- TARJETAS ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px;
+    margin-bottom:14px;
+    box-shadow:0 1px 3px rgba(15,23,42,.06);
+  }
+  .card h2{ font-size:16.5px; margin:0 0 6px; color:#1E3A8A; line-height:1.3; }
+  .card h3{ font-size:15px; margin:16px 0 6px; line-height:1.3; }
+  .card h4{
+    font-size:12.5px;
+    margin:16px 0 6px;
+    color:#334155;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .hint{ font-size:12.8px; color:var(--muted); margin:0 0 10px; line-height:1.45; }
+  .lbl{ display:block; font-size:13px; font-weight:700; margin:12px 0 6px; color:#1E293B; }
+
+  /* ---------- CAMPOS ---------- */
+  input[type=text], select{
+    width:100%;
+    font-family:inherit;
+    font-size:15px;
+    padding:12px;
+    border-radius:12px;
+    border:2px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    min-height:48px;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  select{ background-image:linear-gradient(45deg,transparent 50%,#475569 50%),linear-gradient(135deg,#475569 50%,transparent 50%); background-position:calc(100% - 20px) 21px,calc(100% - 14px) 21px; background-size:6px 6px,6px 6px; background-repeat:no-repeat; padding-right:38px; }
+  input[type=text]:focus, select:focus{ outline:none; border-color:var(--blue); }
+
+  /* ---------- BOTONES ---------- */
+  .btn{
+    display:block;
+    width:100%;
+    min-height:48px;
+    padding:12px 16px;
+    border-radius:12px;
+    border:2px solid transparent;
+    font-family:inherit;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:14px;
+    text-align:center;
+    transition:transform .08s ease, background .15s ease;
+  }
+  .btn:active{ transform:scale(.985); }
+  .btn:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
+  .btn-primary{ background:var(--blue); color:#fff; }
+  .btn-success{ background:var(--green); color:#fff; }
+  .btn-ghost{ background:#fff; border-color:var(--line); color:var(--ink); }
+
+  /* ---------- OPCIONES ---------- */
+  .opts{ display:flex; flex-direction:column; gap:8px; margin:10px 0 4px; }
+  .opt{
+    width:100%;
+    text-align:left;
+    background:#fff;
+    border:2px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    font-family:inherit;
+    font-size:14px;
+    color:var(--ink);
+    min-height:48px;
+    line-height:1.35;
+    cursor:pointer;
+    transition:background .15s, border-color .15s;
+  }
+  .opt:active{ background:#E2E8F0; }
+  .opt.sel{ border-color:var(--blue); background:var(--blue-soft); font-weight:600; }
+  .opt.ok{ border-color:var(--green); background:var(--green-soft); }
+  .opt.bad{ border-color:var(--red); background:var(--red-soft); }
+  .opt.done{ border-color:var(--green); background:var(--green-soft); opacity:.8; }
+  .flow-opt .flow-tit{ display:block; font-weight:700; font-size:14px; }
+  .flow-opt .flow-desc{ display:block; font-size:12.5px; color:var(--muted); margin-top:2px; }
+  .flow-badge{
+    display:inline-block;
+    background:var(--green);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding:2px 9px;
+    border-radius:999px;
+    margin-bottom:5px;
+  }
+
+  /* ---------- FEEDBACK ---------- */
+  .feedback{
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:12px;
+    font-size:13.5px;
+    border:1px solid transparent;
+    line-height:1.45;
+  }
+  .feedback.ok{ background:var(--green-soft); border-color:#86EFAC; color:#14532D; }
+  .feedback.err{ background:var(--red-soft); border-color:#FCA5A5; color:#7F1D1D; }
+  .feedback.info{ background:var(--blue-soft); border-color:#93C5FD; color:#1E3A8A; }
+
+  /* ---------- PROGRESO ---------- */
+  .progress{ display:flex; gap:6px; margin-bottom:12px; }
+  .chip{
+    flex:1;
+    text-align:center;
+    font-size:11.5px;
+    font-weight:700;
+    padding:8px 4px;
+    border-radius:10px;
+    background:#E2E8F0;
+    color:#64748B;
+    border:1px solid var(--line);
+  }
+  .chip.on{ background:var(--blue); color:#fff; border-color:var(--blue); }
+  .chip.done{ background:var(--green); color:#fff; border-color:var(--green); }
+
+  .alumno-banner{
+    background:#E0E7FF;
+    border:1px solid #C7D2FE;
+    color:#1E3A8A;
+    border-radius:12px;
+    padding:10px 12px;
+    font-size:12.5px;
+    font-weight:600;
+    margin-bottom:12px;
+    line-height:1.4;
+  }
+  .caso-tag{
+    display:inline-block;
+    background:#1E3A8A;
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border-radius:999px;
+    margin-bottom:8px;
+  }
+  .situacion{
+    font-size:14px;
+    background:#F1F5F9;
+    border-left:4px solid var(--blue);
+    border-radius:0 10px 10px 0;
+    padding:12px 14px;
+    margin:0 0 6px;
+    line-height:1.45;
+  }
+
+  /* ---------- SIMULADOR TÉRMICO ---------- */
+  .term-panel{
+    background:#F8FAFC;
+    border:2px dashed var(--line);
+    border-radius:14px;
+    padding:14px;
+    margin-top:10px;
+  }
+  .slider-box{ margin-top:14px; }
+  .slider-box label{ display:block; font-size:13.5px; font-weight:700; margin-bottom:4px; }
+  #temp-val{ color:var(--blue); }
+  input[type=range]{
+    width:100%;
+    height:44px;
+    margin:0;
+    background:transparent;
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:12px; border-radius:8px; background:#E2E8F0;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:28px; height:28px; border-radius:50%;
+    background:var(--blue); border:3px solid #fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    margin-top:-8px;
+  }
+  input[type=range]::-moz-range-track{ height:12px; border-radius:8px; background:#E2E8F0; }
+  input[type=range]::-moz-range-thumb{
+    width:28px; height:28px; border-radius:50%;
+    background:var(--blue); border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.25);
+  }
+  .barra{
+    height:22px;
+    background:#E2E8F0;
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    margin:8px 0 12px;
+  }
+  .barra-fill{
+    height:100%;
+    width:0%;
+    background:#16A34A;
+    border-radius:12px;
+    transition:width .12s linear, background .2s linear;
+  }
+  .estado{
+    padding:12px 14px;
+    border-radius:12px;
+    font-size:13.5px;
+    border:1px solid var(--line);
+    background:#F1F5F9;
+    line-height:1.45;
+  }
+  .estado-ok{ background:var(--green-soft); border-color:#86EFAC; color:#14532D; }
+  .estado-alerta{ background:var(--amber-soft); border-color:#FCD34D; color:#78350F; }
+  .estado-fallo{ background:var(--red-soft); border-color:#FCA5A5; color:#7F1D1D; }
+  .mat-nota{ font-size:12.5px; color:var(--muted); margin-top:10px; line-height:1.45; }
+
+  /* ---------- REDACCIONES ---------- */
+  .redaccion{ margin-bottom:20px; }
+  .redaccion label{ display:block; font-size:13.5px; margin-bottom:6px; line-height:1.45; }
+  .redaccion label .hint{ display:block; font-weight:400; margin:4px 0 0; }
+  textarea{
+    width:100%;
+    font-family:inherit;
+    font-size:14px;
+    line-height:1.45;
+    padding:12px;
+    border-radius:12px;
+    border:2px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    resize:vertical;
+    min-height:130px;
+  }
+  textarea:focus{ outline:none; border-color:var(--blue); }
+  textarea.incompleto{ border-color:#F59E0B; background:#FFFBEB; }
+  textarea.completo{ border-color:#16A34A; }
+  .contador{ font-size:12.5px; margin-top:6px; color:var(--muted); font-weight:600; }
+  .contador.ok{ color:var(--green); }
+  .contador.casi{ color:var(--amber); }
+  .aviso{
+    margin-top:12px;
+    font-size:13px;
+    padding:12px 14px;
+    border-radius:12px;
+    background:#FEF3C7;
+    border:1px solid #FCD34D;
+    color:#78350F;
+    line-height:1.45;
+  }
+  .aviso.ok{ background:var(--green-soft); border-color:#86EFAC; color:#14532D; }
+
+  /* ---------- MODAL ---------- */
+  .modal-bg{
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:rgba(15,23,42,.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    z-index:50;
+  }
+  .modal{
+    background:#fff;
+    border-radius:18px;
+    padding:20px;
+    max-width:420px;
+    width:100%;
+    box-shadow:0 20px 45px rgba(0,0,0,.35);
+    max-height:88vh;
+    overflow-y:auto;
+  }
+  .modal h3{ margin:0 0 10px; font-size:17px; color:#15803D; }
+  .modal p{ font-size:13.5px; line-height:1.5; margin:0 0 10px; }
+  .modal a.btn{ text-decoration:none; line-height:24px; }
+
+  .foot{
+    text-align:center;
+    font-size:11.5px;
+    color:#94A3B8;
+    margin-top:18px;
+    line-height:1.5;
+  }
+  .firma{
+    margin-top:26px;
+    border-top:1px solid #999;
+    padding-top:6px;
+    width:70%;
+    font-size:11pt;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="head">
+    <div class="head-top">E.E.T.P. N° 468</div>
+    <h1>El Taller Moderno</h1>
+    <p class="head-sub">Ecosistema del Técnico Mecánico · Simulador interactivo</p>
+    <p class="head-meta">Informática Aplicada · 4° Año Técnico Mecánico · Prof. Diego Rodríguez</p>
+  </header>
+
+  <!-- ================= IDENTIFICACIÓN ================= -->
+  <section class="card" id="card-id">
+    <h2>Identificación del alumno</h2>
+    <p class="hint">Completá tus datos para habilitar el simulador y poder generar el informe final.</p>
+
+    <label class="lbl" for="inp-nombre">Apellido y Nombre</label>
+    <input type="text" id="inp-nombre" placeholder="Ej.: Gómez, Martina" autocomplete="off" autocapitalize="words">
+
+    <label class="lbl" for="inp-curso">División / Curso</label>
+    <select id="inp-curso">
+      <option value="">Seleccioná tu curso...</option>
+      <option value="4° 1°">4° 1°</option>
+      <option value="4° 2°">4° 2°</option>
+      <option value="4° 3°">4° 3°</option>
+      <option value="4° 4°">4° 4°</option>
+      <option value="4° 5°">4° 5°</option>
+    </select>
+
+    <button type="button" class="btn btn-primary" id="btn-empezar" disabled>Comenzar el simulador</button>
+  </section>
+
+  <!-- ================= APLICACIÓN ================= -->
+  <main id="app" hidden>
+
+    <div class="alumno-banner" id="alumno-banner"></div>
+
+    <div class="progress">
+      <span class="chip" id="chip1">Etapa 1</span>
+      <span class="chip" id="chip2">Etapa 2</span>
+      <span class="chip" id="chip3">Etapa 3</span>
+    </div>
+
+    <!-- ---------- ETAPA 1 ---------- -->
+    <section class="card" id="sec1" hidden>
+      <h2>Etapa 1 · Diagnóstico en las Zonas del Taller</h2>
+      <p class="hint">Para cada situación elegí <strong>la zona del taller</strong> y <strong>la herramienta del manual</strong>. Si te equivocás, el simulador te explica el error y podés reintentar.</p>
+      <div id="e1-body"></div>
+    </section>
+
+    <!-- ---------- ETAPA 2 ---------- -->
+    <section class="card" id="sec2" hidden>
+      <h2>Etapa 2 · El Hilo Digital y la Simulación de Estrés</h2>
+
+      <div id="e2-flow">
+        <h3>Parte A · Ordená el flujo digital</h3>
+        <p class="hint">Tocá las herramientas en el orden correcto: del <strong>Paso 1</strong> al <strong>Paso 4</strong> del Hilo Digital.</p>
+        <div class="opts" id="flow-opts"></div>
+        <div class="feedback" id="fb2" hidden></div>
+      </div>
+
+      <div id="e2-term" hidden>
+        <h3>Parte B · Mini-simulador térmico (FEA)</h3>
+        <p class="hint">Elegí el material de la pieza y deslizá la temperatura del ensayo virtual para ver si resiste o falla.</p>
+
+        <div class="term-panel">
+          <div class="opts" id="mat-opts">
+            <button type="button" class="opt" data-mat="abs">Plástico ABS</button>
+            <button type="button" class="opt" data-mat="alum">Aluminio</button>
+            <button type="button" class="opt" data-mat="acero">Acero Aleado</button>
+          </div>
+
+          <div class="slider-box">
+            <label for="temp">Temperatura de ensayo: <strong id="temp-val">20 °C</strong></label>
+            <input type="range" id="temp" min="20" max="600" step="5" value="20">
+          </div>
+
+          <div class="barra"><div class="barra-fill" id="barra-fill"></div></div>
+          <div class="estado" id="estado-txt">Elegí un material para iniciar el ensayo.</div>
+          <div class="mat-nota" id="mat-nota"></div>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btn-ir3" hidden>Continuar a la Etapa 3 →</button>
+    </section>
+
+    <!-- ---------- ETAPA 3 ---------- -->
+    <section class="card" id="sec3" hidden>
+      <h2>Etapa 3 · Trabajo Práctico Final</h2>
+      <p class="hint">Escribí tus respuestas con tus propias palabras. Cada redacción necesita <strong>mínimo 20 palabras</strong> para habilitar la descarga del informe.</p>
+
+      <div class="redaccion">
+        <label for="r1">
+          <strong>Redacción 1 · Aplicación Física</strong>
+          <span class="hint">Describí un escenario real del taller mecánico donde aplicarías al menos dos herramientas de medición o de pruebas físicas vistas en el simulador.</span>
+        </label>
+        <textarea id="r1" rows="6" placeholder="Ej.: En el taller, cuando ingresa un motor que pierde potencia, primero..."></textarea>
+        <div class="contador" id="c1">Palabras escritas: 0 / 20 mínimas</div>
+      </div>
+
+      <div class="redaccion">
+        <label for="r2">
+          <strong>Redacción 2 · Integración Digital</strong>
+          <span class="hint">Explicá cómo utilizarías el Hilo Digital (CAD, FEA, CAM y Excel/VBA) para diseñar y fabricar una pieza mecánica nueva desde cero.</span>
+        </label>
+        <textarea id="r2" rows="6" placeholder="Ej.: Primero modelaría la pieza en un software CAD como..."></textarea>
+        <div class="contador" id="c2">Palabras escritas: 0 / 20 mínimas</div>
+      </div>
+
+      <div class="redaccion">
+        <label for="r3">
+          <strong>Redacción 3 · Seguridad y Mejora Continua</strong>
+          <span class="hint">Argumentá por qué es indispensable respetar las normas de seguridad del taller y realizar pruebas virtuales (FEA) antes de fabricar una pieza física.</span>
+        </label>
+        <textarea id="r3" rows="6" placeholder="Ej.: Las normas de seguridad son indispensables porque..."></textarea>
+        <div class="contador" id="c3">Palabras escritas: 0 / 20 mínimas</div>
+      </div>
+
+      <button type="button" class="btn btn-success" id="btn-descargar" disabled>Descargar Informe Técnico (.doc)</button>
+      <div class="aviso" id="aviso">Completá las tres redacciones para habilitar la descarga.</div>
+    </section>
+
+  </main>
+
+  <p class="foot">
+    E.E.T.P. N° 468 · Informática Aplicada · 4° Año Técnico Mecánico<br>
+    Prof. Diego Rodríguez · El futuro de la mecánica te espera en el taller.
+  </p>
+</div>
+
+<div id="modal-root"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* =========================================================
+     UTILIDADES
+     ========================================================= */
+  function $(id){ return document.getElementById(id); }
+  function todos(sel, ctx){
+    return Array.prototype.slice.call((ctx || document).querySelectorAll(sel));
+  }
+  function esc(s){
+    return String(s === null || s === undefined ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  function nl2br(s){
+    return esc(s).replace(/\n/g, '<br>');
+  }
+  function palabras(t){
+    if(!t) return 0;
+    var limpio = t.trim();
+    if(limpio === '') return 0;
+    return limpio.split(/\s+/).filter(Boolean).length;
+  }
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i = a.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /* =========================================================
+     DATOS DEL MANUAL
+     ========================================================= */
+  var ZONAS = [
+    'Zona 1: Medición y Diagnóstico',
+    'Zona 2: Fabricación y Ensamblaje',
+    'Zona 3: Pruebas y Análisis Físico'
+  ];
+
+  var HERRAMIENTAS = [
+    'Calibre',
+    'Óhmetro',
+    'Medidor de flujo',
+    'Espejo de inspección',
+    'Calculadora gráfica',
+    'Prensa de conformación en frío',
+    'Impresora 3D',
+    'Sistemas de semiconductores',
+    'Dinamómetro (medidor de fuerza digital)',
+    'Aislador de vibraciones'
+  ];
+
+  var CASOS = [
+    {
+      titulo: 'Caso 1 · La celda robótica sin energía',
+      texto: 'La celda robótica de la línea de mecanizado quedó sin energía. Hay que medir la resistencia eléctrica de los circuitos internos y aislar la sección averiada para reemplazarla.',
+      zona: ZONAS[0],
+      herr: 'Óhmetro',
+      expZona: 'La medición y el diagnóstico de fallos eléctricos corresponden a la Zona 1: Medición y Diagnóstico.',
+      expHerr: 'El óhmetro mide resistencia eléctrica y permite aislar el tramo averiado, tal como indica el PASO A PASO del manual.',
+      errorZona: 'Revisá el manual: el diagnóstico de fallos eléctricos se realiza en la Zona 1 (Medición y Diagnóstico). La Zona 2 fabrica y la Zona 3 prueba esfuerzos físicos.',
+      errorHerr: 'Esa herramienta no mide resistencia eléctrica. Necesitás el instrumento que mide ohmios para detectar el tramo del circuito que está abierto.'
+    },
+    {
+      titulo: 'Caso 2 · El engranaje plástico desgastado',
+      texto: 'Un engranaje plástico del mecanismo de avance está desgastado y no hay repuesto en stock. Se necesita un prototipo rápido a partir de un modelo digital para no detener la producción.',
+      zona: ZONAS[1],
+      herr: 'Impresora 3D',
+      expZona: 'Fabricar un prototipo es una tarea de la Zona 2: Fabricación y Ensamblaje.',
+      expHerr: 'La impresora 3D crea objetos tridimensionales a partir de modelos digitales: es la herramienta del prototipado rápido.',
+      errorZona: 'Fabricar o materializar una pieza nueva es tarea de la Zona 2 (Fabricación y Ensamblaje). La Zona 1 mide y diagnostica; la Zona 3 prueba esfuerzos.',
+      errorHerr: 'Esa herramienta no construye la pieza. Para materializar el modelo digital en plástico necesitás el equipo que traduce el archivo 3D en instrucciones de extrusión.'
+    },
+    {
+      titulo: 'Caso 3 · El motor industrial que vibra demasiado',
+      texto: 'Un motor industrial presenta una vibración excesiva que amenaza la integridad estructural del bastidor. Hay que detectar la causa y aislarla antes de que provoque daños mayores.',
+      zona: ZONAS[2],
+      herr: 'Aislador de vibraciones',
+      expZona: 'El análisis de vibraciones y de estrés mecánico es propio de la Zona 3: Pruebas y Análisis Físico.',
+      expHerr: 'El aislador de vibraciones detecta y mide vibraciones perjudiciales para encontrar la causa y prevenir daños estructurales.',
+      errorZona: 'Las pruebas de estrés mecánico y el análisis de vibraciones se realizan en la Zona 3 (Pruebas y Análisis Físico).',
+      errorHerr: 'Esa herramienta no detecta ni aísla vibraciones. Necesitás el dispositivo que mide las vibraciones perjudiciales de la maquinaria.'
+    },
+    {
+      titulo: 'Caso 4 · El caudal de aire y combustible',
+      texto: 'En el banco de pruebas hay que verificar el caudal de aire de admisión y el consumo de combustible de un motor antes de ajustar la mezcla.',
+      zona: ZONAS[0],
+      herr: 'Medidor de flujo',
+      expZona: 'La evaluación de caudales, dimensiones y flujos se realiza en la Zona 1: Medición y Diagnóstico.',
+      expHerr: 'El medidor de flujo evalúa caudales de aire o líquidos, por ejemplo el consumo de combustible.',
+      errorZona: 'Evaluar caudales y flujos es parte de la Zona 1 (Medición y Diagnóstico), con herramientas de alta precisión.',
+      errorHerr: 'Esa herramienta no mide caudal. Necesitás el instrumento que evalúa el paso de aire o de líquido por un conducto.'
+    },
+    {
+      titulo: 'Caso 5 · La tensión del cableado del vehículo eléctrico',
+      texto: 'Antes de homologar el cableado de un vehículo eléctrico hay que medir la tensión de tracción que soporta, para evitar rupturas durante el funcionamiento.',
+      zona: ZONAS[2],
+      herr: 'Dinamómetro (medidor de fuerza digital)',
+      expZona: 'La medición de fuerzas y los ensayos de esfuerzo corresponden a la Zona 3: Pruebas y Análisis Físico.',
+      expHerr: 'El dinamómetro mide la cantidad de tensión de empuje o tracción sobre un elemento, justo lo que exige este ensayo.',
+      errorZona: 'Los ensayos de tracción y esfuerzo físico se hacen en la Zona 3 (Pruebas y Análisis Físico), con equipos de estrés mecánico.',
+      errorHerr: 'Esa herramienta no mide fuerza de tracción. Necesitás el medidor de fuerza digital que cuantifica el empuje o la tracción.'
+    }
+  ];
+
+  var FLUJO = [
+    {
+      orden: 1,
+      titulo: 'Excel y VBA',
+      desc: 'Registrar miles de lecturas de vibración y automatizar los gráficos de análisis de fallos.'
+    },
+    {
+      orden: 2,
+      titulo: 'Software CAD (SolidWorks / Fusion 360)',
+      desc: 'Modelar en 3D el bloque del motor y dibujar los planos colaborativos.'
+    },
+    {
+      orden: 3,
+      titulo: 'Simulación FEA (ANSYS / Autodesk Inventor)',
+      desc: 'Aplicar calor virtual extremo y verificar si la pieza se rompe bajo estrés térmico.'
+    },
+    {
+      orden: 4,
+      titulo: 'Fabricación CAM / Impresión 3D',
+      desc: 'Enviar las instrucciones de corte o extrusión a la maquinaria del taller.'
+    }
+  ];
+
+  var MATERIALES = {
+    abs:   { nombre: 'Plástico ABS',  fallo: 100, alerta: 80,  nota: 'El ABS se reblandece a partir de los 80 °C y falla cerca de los 100 °C.' },
+    alum:  { nombre: 'Aluminio',      fallo: 400, alerta: 250, nota: 'El aluminio pierde resistencia mecánica desde los 250 °C y falla estructuralmente cerca de los 400 °C.' },
+    acero: { nombre: 'Acero Aleado',  fallo: 550, alerta: 450, nota: 'El acero aleado mantiene su resistencia hasta los 450 °C y falla cerca de los 550 °C.' }
+  };
+
+  /* =========================================================
+     ESTADO
+     ========================================================= */
+  var alumno = { nombre: '', curso: '' };
+
+  var e1 = {
+    caso: 0,
+    intentos: [0, 0, 0, 0, 0],
+    selZona: null,
+    selHerr: null,
+    resueltos: 0,
+    bloqueado: false
+  };
+
+  var e2 = {
+    paso: 0,
+    errores: 0,
+    material: null,
+    temp: 20,
+    toco: false,
+    fallo: false,
+    maxTemp: 20
+  };
+
+  /* =========================================================
+     IDENTIFICACIÓN
+     ========================================================= */
+  function validarId(){
+    var n = $('inp-nombre').value.trim();
+    var c = $('inp-curso').value;
+    $('btn-empezar').disabled = !(n.length >= 3 && c !== '');
+  }
+
+  function comenzar(){
+    var n = $('inp-nombre').value.trim();
+    var c = $('inp-curso').value;
+    if(n.length < 3 || !c) return;
+
+    alumno.nombre = n;
+    alumno.curso = c;
+
+    $('card-id').hidden = true;
+    $('app').hidden = false;
+    $('alumno-banner').textContent = 'Alumno: ' + n + ' · Curso: ' + c + ' · E.E.T.P. N° 468';
+    $('sec1').hidden = false;
+    $('chip1').className = 'chip on';
+
+    renderCaso();
+    window.scrollTo(0, 0);
+  }
+
+  /* =========================================================
+     ETAPA 1 · DIAGNÓSTICO
+     ========================================================= */
+  function renderCaso(){
+    var c = CASOS[e1.caso];
+    e1.selZona = null;
+    e1.selHerr = null;
+    e1.bloqueado = false;
+
+    var h = '';
+    h += '<div class="caso-tag">Caso ' + (e1.caso + 1) + ' de 5</div>';
+    h += '<h3>' + c.titulo + '</h3>';
+    h += '<p class="situacion">' + c.texto + '</p>';
+
+    h += '<h4>Paso A · ¿En qué zona del taller se resuelve?</h4>';
+    h += '<div class="opts" id="opts-zona">';
+    for(var i = 0; i < ZONAS.length; i++){
+      h += '<button type="button" class="opt" data-zona="' + i + '">' + ZONAS[i] + '</button>';
+    }
+    h += '</div>';
+
+    h += '<h4>Paso B · ¿Qué herramienta del manual utilizás?</h4>';
+    h += '<div class="opts" id="opts-herr">';
+    for(var j = 0; j < HERRAMIENTAS.length; j++){
+      h += '<button type="button" class="opt" data-herr="' + j + '">' + HERRAMIENTAS[j] + '</button>';
+    }
+    h += '</div>';
+
+    h += '<button type="button" class="btn btn-primary" id="btn-verificar" disabled>Comprobar caso</button>';
+    h += '<div class="feedback" id="fb1" hidden></div>';
+
+    $('e1-body').innerHTML = h;
+
+    todos('#opts-zona .opt').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(e1.bloqueado) return;
+        e1.selZona = parseInt(b.getAttribute('data-zona'), 10);
+        todos('#opts-zona .opt').forEach(function(x){ x.classList.remove('sel'); });
+        b.classList.add('sel');
+        actualizarBotonVerificar();
+      });
+    });
+
+    todos('#opts-herr .opt').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(e1.bloqueado) return;
+        e1.selHerr = parseInt(b.getAttribute('data-herr'), 10);
+        todos('#opts-herr .opt').forEach(function(x){ x.classList.remove('sel'); });
+        b.classList.add('sel');
+        actualizarBotonVerificar();
+      });
+    });
+
+    $('btn-verificar').addEventListener('click', verificarCaso);
+  }
+
+  function actualizarBotonVerificar(){
+    var b = $('btn-verificar');
+    if(!b) return;
+    b.disabled = (e1.selZona === null || e1.selHerr === null || e1.bloqueado);
+  }
+
+  function verificarCaso(){
+    var c = CASOS[e1.caso];
+    if(e1.selZona === null || e1.selHerr === null || e1.bloqueado) return;
+
+    e1.intentos[e1.caso]++;
+
+    var okZ = (ZONAS[e1.selZona] === c.zona);
+    var okH = (HERRAMIENTAS[e1.selHerr] === c.herr);
+    var fb = $('fb1');
+
+    if(okZ && okH){
+      e1.bloqueado = true;
+      e1.resueltos++;
+
+      var bz = todos('#opts-zona .opt')[e1.selZona];
+      var bh = todos('#opts-herr .opt')[e1.selHerr];
+      bz.classList.remove('sel');
+      bz.classList.add('ok');
+      bh.classList.remove('sel');
+      bh.classList.add('ok');
+
+      $('btn-verificar').disabled = true;
+
+      fb.hidden = false;
+      fb.className = 'feedback ok';
+      fb.innerHTML = '<strong>¡Correcto!</strong> ' + c.expZona + ' ' + c.expHerr +
+        '<br><em>Resuelto en ' + e1.intentos[e1.caso] + ' intento(s).</em>';
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-primary';
+      btn.textContent = (e1.caso < 4) ? 'Siguiente caso →' : 'Ir a la Etapa 2 →';
+      btn.addEventListener('click', siguienteCaso);
+      $('e1-body').appendChild(btn);
+
+    } else {
+      var msg = '<strong>Todavía no es la respuesta correcta.</strong><br>';
+      if(!okZ){ msg += '• Zona: ' + c.errorZona + '<br>'; }
+      if(!okH){ msg += '• Herramienta: ' + c.errorHerr; }
+
+      fb.hidden = false;
+      fb.className = 'feedback err';
+      fb.innerHTML = msg;
+
+      if(!okZ){
+        var z = todos('#opts-zona .opt')[e1.selZona];
+        z.classList.remove('sel');
+        z.classList.add('bad');
+        setTimeout(function(){ z.classList.remove('bad'); }, 900);
+        e1.selZona = null;
+      }
+      if(!okH){
+        var hh = todos('#opts-herr .opt')[e1.selHerr];
+        hh.classList.remove('sel');
+        hh.classList.add('bad');
+        setTimeout(function(){ hh.classList.remove('bad'); }, 900);
+        e1.selHerr = null;
+      }
+      $('btn-verificar').disabled = true;
+    }
+  }
+
+  function siguienteCaso(){
+    if(e1.caso < 4){
+      e1.caso++;
+      renderCaso();
+      var sec = $('sec1');
+      if(sec.scrollIntoView){ sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    } else {
+      irEtapa2();
+    }
+  }
+
+  /* =========================================================
+     ETAPA 2 · HILO DIGITAL
+     ========================================================= */
+  function irEtapa2(){
+    $('sec1').hidden = true;
+    $('sec2').hidden = false;
+    $('chip1').className = 'chip done';
+    $('chip2').className = 'chip on';
+    renderFlujo();
+    actualizarTermico();
+    window.scrollTo(0, 0);
+  }
+
+  function renderFlujo(){
+    var mezclado = shuffle(FLUJO);
+    var cont = $('flow-opts');
+    var h = '';
+
+    mezclado.forEach(function(f){
+      h += '<button type="button" class="opt flow-opt" data-orden="' + f.orden + '">' +
+             '<span class="flow-tit">' + f.titulo + '</span>' +
+             '<span class="flow-desc">' + f.desc + '</span>' +
+           '</button>';
+    });
+
+    cont.innerHTML = h;
+
+    todos('#flow-opts .opt').forEach(function(b){
+      b.addEventListener('click', function(){ tocarFlujo(b); });
+    });
+  }
+
+  function tocarFlujo(btn){
+    if(btn.classList.contains('done')) return;
+
+    var orden = parseInt(btn.getAttribute('data-orden'), 10);
+    var fb = $('fb2');
+
+    if(orden === e2.paso + 1){
+      e2.paso++;
+      btn.classList.add('done');
+      btn.insertAdjacentHTML('afterbegin', '<span class="flow-badge">Paso ' + orden + ' ✔</span>');
+
+      fb.hidden = false;
+      fb.className = 'feedback ok';
+      fb.innerHTML = '<strong>¡Correcto!</strong> «' + FLUJO[orden - 1].titulo + '» ocupa el Paso ' + orden + ' del Hilo Digital.';
+
+      if(e2.paso === 4){
+        fb.innerHTML = '<strong>¡Flujo digital completo!</strong> Datos → Diseño → Simulación → Fabricación. Ahora probá la resistencia térmica de la pieza en el simulador FEA.';
+        $('e2-term').hidden = false;
+        actualizarTermico();
+      }
+    } else {
+      e2.errores++;
+      fb.hidden = false;
+      fb.className = 'feedback err';
+      fb.innerHTML = '<strong>Ese no es el Paso ' + (e2.paso + 1) + '.</strong> Revisá la secuencia del manual: primero los datos y la automatización, después el diseño, luego la simulación de estrés y por último la preparación para fabricar.';
+    }
+  }
+
+  /* ---------- SIMULADOR TÉRMICO ---------- */
+  function setMaterial(key){
+    if(!MATERIALES[key]) return;
+    e2.material = key;
+
+    todos('#mat-opts .opt').forEach(function(b){
+      if(b.getAttribute('data-mat') === key){
+        b.classList.add('sel');
+      } else {
+        b.classList.remove('sel');
+      }
+    });
+
+    $('mat-nota').textContent = MATERIALES[key].nota;
+    actualizarTermico();
+  }
+
+  function onTemp(){
+    var v = parseInt($('temp').value, 10);
+    if(isNaN(v)) v = 20;
+    e2.temp = v;
+    e2.toco = true;
+    if(v > e2.maxTemp) e2.maxTemp = v;
+    actualizarTermico();
+  }
+
+  function actualizarTermico(){
+    var temp = e2.temp;
+    $('temp-val').textContent = temp + ' °C';
+
+    var pct = ((temp - 20) / 580) * 100;
+    if(pct < 0) pct = 0;
+    if(pct > 100) pct = 100;
+
+    var fill = $('barra-fill');
+    var est = $('estado-txt');
+
+    fill.style.width = pct + '%';
+
+    if(!e2.material){
+      fill.style.background = '#94A3B8';
+      est.className = 'estado';
+      est.innerHTML = 'Elegí un material para iniciar el ensayo virtual.';
+      return;
+    }
+
+    var m = MATERIALES[e2.material];
+
+    if(temp >= m.fallo){
+      if(!e2.fallo) e2.fallo = true;
+      fill.style.background = '#DC2626';
+      est.className = 'estado estado-fallo';
+      est.innerHTML = '<strong>FALLO ESTRUCTURAL a ' + temp + ' °C.</strong> El ' + m.nombre +
+        ' supera su límite (' + m.fallo + ' °C): la pieza se deforma y se rompe. Habría que rediseñar en CAD o cambiar de material.';
+    } else if(temp >= m.alerta){
+      fill.style.background = '#F59E0B';
+      est.className = 'estado estado-alerta';
+      est.innerHTML = '<strong>ZONA DE ALERTA a ' + temp + ' °C.</strong> El ' + m.nombre +
+        ' pierde propiedades mecánicas (alerta desde ' + m.alerta + ' °C, falla a ' + m.fallo + ' °C).';
+    } else {
+      fill.style.background = '#16A34A';
+      est.className = 'estado estado-ok';
+      est.innerHTML = '<strong>ESTABLE a ' + temp + ' °C.</strong> El ' + m.nombre +
+        ' trabaja dentro de su rango seguro (falla a ' + m.fallo + ' °C).';
+    }
+
+    comprobarEtapa2();
+  }
+
+  function comprobarEtapa2(){
+    if(e2.paso === 4 && e2.material && e2.toco){
+      $('btn-ir3').hidden = false;
+    }
+  }
+
+  function irEtapa3(){
+    $('sec2').hidden = true;
+    $('sec3').hidden = false;
+    $('chip2').className = 'chip done';
+    $('chip3').className = 'chip on';
+    actualizarContadores();
+    window.scrollTo(0, 0);
+  }
+
+  /* =========================================================
+     ETAPA 3 · REDACCCIONES
+     ========================================================= */
+  var NOMBRES_RED = [
+    'Redacción 1 (Aplicación Física)',
+    'Redacción 2 (Integración Digital)',
+    'Redacción 3 (Seguridad y Mejora Continua)'
+  ];
+  var IDS_RED = ['r1', 'r2', 'r3'];
+
+  function actualizarContadores(){
+    var todoOk = true;
+    var faltan = [];
+
+    for(var i = 0; i < IDS_RED.length; i++){
+      var el = $(IDS_RED[i]);
+      if(!el) continue;
+
+      var n = palabras(el.value);
+      var ok = (n >= 20);
+      var cont = $('c' + (i + 1));
+
+      cont.textContent = 'Palabras escritas: ' + n + ' / 20 mínimas';
+      cont.className = 'contador' + (ok ? ' ok' : (n > 0 ? ' casi' : ''));
+
+      if(ok){
+        el.classList.remove('incompleto');
+        el.classList.add('completo');
+      } else {
+        el.classList.remove('completo');
+        el.classList.add('incompleto');
+        todoOk = false;
+        faltan.push(NOMBRES_RED[i] + ' (' + n + '/20)');
+      }
+    }
+
+    var etapasOk = (e1.resueltos === 5 && e2.paso === 4 && e2.material && e2.toco);
+    var listo = todoOk && etapasOk;
+
+    $('btn-descargar').disabled = !listo;
+
+    var av = $('aviso');
+    if(listo){
+      av.className = 'aviso ok';
+      av.innerHTML = '<strong>¡Todo listo!</strong> Podés descargar el informe .doc, subirlo a Google Classroom y luego transcribirlo a tu carpeta.';
+    } else if(!etapasOk){
+      av.className = 'aviso';
+      av.innerHTML = 'Falta completar alguna etapa anterior del simulador.';
+    } else {
+      av.className = 'aviso';
+      av.innerHTML = 'Falta completar: ' + faltan.join(' · ');
+    }
+  }
+
+  /* =========================================================
+     GENERACIÓN DEL INFORME .DOC
+     ========================================================= */
+  function generarInforme(){
+    var ok = (e1.resueltos === 5 &&
+              e2.paso === 4 &&
+              e2.material &&
+              e2.toco &&
+              palabras($('r1').value) >= 20 &&
+              palabras($('r2').value) >= 20 &&
+              palabras($('r3').value) >= 20);
+
+    if(!ok) return;
+
+    var d = new Date();
+    var fechaTxt = d.toLocaleDateString() + ' a las ' + d.toLocaleTimeString();
+
+    var base = alumno.nombre;
+    try {
+      base = base.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    } catch(err){ /* navegadores antiguos */ }
+    base = base.replace(/[^A-Za-z0-9 ]/g, '').trim().replace(/\s+/g, '_').substring(0, 40);
+    if(!base) base = 'Alumno';
+
+    var nombreArchivo = 'TP_TallerModerno_' + base + '.doc';
+
+    /* -------- Cuerpo del documento -------- */
+    var html = '';
+
+    html += '<h1>Informe Técnico · El Taller Moderno</h1>';
+    html += '<p><strong>E.E.T.P. N° 468</strong> — Escuela de Educación Técnico Profesional</p>';
+    html += '<p><strong>Materia:</strong> Informática Aplicada — 4° Año (Especialidad Técnico Mecánico)<br>';
+    html += '<strong>Profesor:</strong> Diego Rodríguez<br>';
+    html += '<strong>Alumno:</strong> ' + esc(alumno.nombre) + '<br>';
+    html += '<strong>Curso / División:</strong> ' + esc(alumno.curso) + '<br>';
+    html += '<strong>Fecha y hora de realización:</strong> ' + esc(fechaTxt) + '</p>';
+
+    html += '<h2>1. Desempeño en la Etapa 1 — Diagnóstico en las Zonas del Taller</h2>';
+    html += '<p>Casos resueltos: <strong>' + e1.resueltos + ' de 5</strong>.</p>';
+    html += '<table>';
+    html += '<tr><th>Caso</th><th>Situación</th><th>Zona del taller</th><th>Herramienta</th><th>Intentos</th></tr>';
+    for(var i = 0; i < CASOS.length; i++){
+      html += '<tr>' +
+                '<td style="text-align:center">' + (i + 1) + '</td>' +
+                '<td>' + esc(CASOS[i].titulo) + '</td>' +
+                '<td>' + esc(CASOS[i].zona) + '</td>' +
+                '<td>' + esc(CASOS[i].herr) + '</td>' +
+                '<td style="text-align:center">' + e1.intentos[i] + '</td>' +
+              '</tr>';
+    }
+    html += '</table>';
+
+    html += '<h2>2. Desempeño en la Etapa 2 — El Hilo Digital y la Simulación de Estrés</h2>';
+    html += '<p><strong>Flujo digital ordenado correctamente (Paso 1 a Paso 4):</strong></p>';
+    html += '<ol>';
+    for(var k = 0; k < FLUJO.length; k++){
+      html += '<li><strong>' + esc(FLUJO[k].titulo) + '</strong> — ' + esc(FLUJO[k].desc) + '</li>';
+    }
+    html += '</ol>';
+    html += '<p><strong>Errores de ordenamiento cometidos:</strong> ' + e2.errores + '</p>';
+
+    var matNombre = MATERIALES[e2.material] ? MATERIALES[e2.material].nombre : 'No realizado';
+    html += '<p><strong>Mini-simulador térmico (FEA):</strong> Material ensayado: ' + esc(matNombre) +
+            '. Temperatura máxima alcanzada: <strong>' + e2.maxTemp + ' °C</strong>. ';
+    if(e2.fallo){
+      html += 'Se alcanzó el <strong>punto de fallo estructural</strong> del material durante el ensayo virtual, lo que obligaría a rediseñar la pieza o a cambiar el material.';
+    } else {
+      html += 'No se alcanzó el punto de fallo estructural del material durante el ensayo virtual.';
+    }
+    html += '</p>';
+
+    html += '<h2>3. Redacciones del Trabajo Práctico</h2>';
+
+    html += '<h3>Redacción 1 — Aplicación Física (herramientas de medición y prueba)</h3>';
+    html += '<p>' + nl2br($('r1').value) + '</p>';
+
+    html += '<h3>Redacción 2 — Integración Digital (CAD, FEA, CAM, Excel/VBA)</h3>';
+    html += '<p>' + nl2br($('r2').value) + '</p>';
+
+    html += '<h3>Redacción 3 — Seguridad y Mejora Continua</h3>';
+    html += '<p>' + nl2br($('r3').value) + '</p>';
+
+    html += '<p class="firma">Firma del alumno</p>';
+    html += '<p>Aclaración: ' + esc(alumno.nombre) + ' — ' + esc(alumno.curso) + '</p>';
+
+    /* -------- Documento Word completo -------- */
+    var documento = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+      'xmlns:w="urn:schemas-microsoft-com:office:word" ' +
+      'xmlns="http://www.w3.org/TR/REC-html40"><head>' +
+      '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">' +
+      '<title>Informe Técnico - El Taller Moderno</title>' +
+      '<style>' +
+      '@page{ size:A4; margin:2cm; }' +
+      'body{ font-family:Calibri,Arial,sans-serif; font-size:11pt; color:#000000; line-height:1.5; }' +
+      'h1{ font-size:17pt; color:#1F3864; margin:0 0 8px 0; }' +
+      'h2{ font-size:13pt; color:#1F3864; border-bottom:1px solid #1F3864; padding-bottom:3px; margin-top:18px; }' +
+      'h3{ font-size:12pt; color:#1F3864; margin-top:14px; }' +
+      'p{ margin:6px 0; text-align:justify; }' +
+      'table{ border-collapse:collapse; width:100%; font-size:10pt; margin-top:8px; }' +
+      'th,td{ border:1px solid #666666; padding:5px; vertical-align:top; }' +
+      'th{ background:#DEEAF6; text-align:left; }' +
+      '.firma{ margin-top:30px; border-top:1px solid #333333; padding-top:6px; width:65%; }' +
+      'ol,ul{ margin:6px 0 6px 18px; }' +
+      'li{ margin-bottom:4px; }' +
+      '</style></head><body>' + html + '</body></html>';
+
+    /* -------- Descarga universal para Android -------- */
+    var blob = new Blob(['\ufeff' + documento], { type: 'application/msword;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = nombreArchivo;
+    a.style.display = 'none';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+
+    try {
+      a.click();
+    } catch(err){
+      window.open(url, '_blank');
+    }
+
+    setTimeout(function(){
+      if(a && a.parentNode){ a.parentNode.removeChild(a); }
+    }, 1000);
+
+    mostrarModal(url, nombreArchivo);
+  }
+
+  function mostrarModal(url, nombreArchivo){
+    var root = $('modal-root');
+    root.innerHTML = '';
+
+    var bg = document.createElement('div');
+    bg.className = 'modal-bg';
+
+    var m = document.createElement('div');
+    m.className = 'modal';
+
+    var titulo = document.createElement('h3');
+    titulo.textContent = '✅ Informe generado';
+    m.appendChild(titulo);
+
+    var p1 = document.createElement('p');
+    p1.innerHTML = 'Se generó el archivo <strong>' + esc(nombreArchivo) + '</strong>. Buscalo en la carpeta <em>Descargas</em> de tu celular y subilo a Google Classroom.';
+    m.appendChild(p1);
+
+    var p2 = document.createElement('p');
+    p2.className = 'hint';
+    p2.textContent = 'Si la descarga no comenzó automáticamente, tocá el botón de abajo.';
+    m.appendChild(p2);
+
+    var a = document.createElement('a');
+    a.className = 'btn btn-success';
+    a.href = url;
+    a.download = nombreArchivo;
+    a.textContent = 'Descargar nuevamente (.doc)';
+    a.style.textDecoration = 'none';
+    a.style.lineHeight = '24px';
+    m.appendChild(a);
+
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn btn-ghost';
+    b.textContent = 'Cerrar';
+    b.addEventListener('click', function(){ root.innerHTML = ''; });
+    m.appendChild(b);
+
+    bg.appendChild(m);
+    root.appendChild(bg);
+  }
+
+  /* =========================================================
+     INICIALIZACIÓN
+     ========================================================= */
+  function init(){
+    $('inp-nombre').addEventListener('input', validarId);
+    $('inp-curso').addEventListener('change', validarId);
+    $('btn-empezar').addEventListener('click', comenzar);
+
+    $('temp').addEventListener('input', onTemp);
+    $('temp').addEventListener('change', onTemp);
+
+    todos('#mat-opts .opt').forEach(function(b){
+      b.addEventListener('click', function(){
+        setMaterial(b.getAttribute('data-mat'));
+      });
+    });
+
+    IDS_RED.forEach(function(id){
+      var el = $(id);
+      el.addEventListener('input', actualizarContadores);
+      el.addEventListener('change', actualizarContadores);
+      el.addEventListener('keyup', actualizarContadores);
+    });
+
+    $('btn-ir3').addEventListener('click', irEtapa3);
+    $('btn-descargar').addEventListener('click', generarInforme);
+  }
+
+  init();
+
+})();
+</script>
+</body>
+</html>
